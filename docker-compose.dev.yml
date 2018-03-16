@@ -1,0 +1,24 @@
+version: '2.1'
+services:
+  rabbitmq:
+    ports:
+      - 5672:5672
+
+  config:
+    build: config
+    ports:
+      - 8888:8888
+
+  registry:
+    build: registry
+
+  gateway:
+    build: gateway
+
+  monitoring:
+    build: monitoring
+
+  fizz-buzz-service:
+      build: fizz-buzz-service
+      ports:
+        - 7000:7000

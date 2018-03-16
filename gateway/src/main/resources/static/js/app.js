@@ -1,0 +1,220 @@
+var app = angular.module('fizzBuzzApp', ['ngRoute', 'ngAnimate', 'ngResource', 'ngMaterial', 'ngMessages', 'material.svgAssetsCache']);
+
+
+app.config(function ($routeProvider, $httpProvider) {
+    $routeProvider.when('/plus', {
+        templateUrl: 'plus.html',
+        controller: 'PlusController'
+    }).when('/classic', {
+        templateUrl: 'classic.html',
+        controller: 'ClassicController'
+    }).when('/classicln', {
+        templateUrl: 'classic.html',
+        controller: 'ClassicLNController'
+    }).otherwise({
+        redirectTo: '/classic'
+
+    });
+    $httpProvider.interceptors.push(function ($q) {
+        return {
+            'request': function (config) {
+                $('#processing').show();
+                return config;
+            },
+
+            'response': function (response) {
+                $('#processing').hide();
+                return response;
+            },
+            'requestError': function (rejection) {
+                $('#processing').hide();
+                return $q.reject(rejection);
+            },
+            'responseError': function (rejection) {
+                $('#processing').hide();
+                return $q.reject(rejection);
+            }
+
+        };
+    });
+
+}).run(function ($rootScope, $timeout) {
+
+    $rootScope.messeges = [];
+
+    $rootScope.addMessege = function (message, messageClass, strong) {
+        $rootScope.messeges.push({message: message, messageClass: messageClass, strong: strong});
+
+        // Simulate 2 seconds loading delay
+        $timeout(function () {
+
+            // Loadind done here - Show message for 3 more seconds.
+            $timeout(function () {
+                $rootScope.messeges.splice(0, 1);
+            }, 3000);
+
+        }, 2000);
+    };
+
+
+});
+
+app.controller('ClassicController', function ($scope, $rootScope, $http) {
+    $scope.classicSearch = {
+        numbers: ""
+    };
+
+    $scope.teste = '';
+    $scope.result = '';
+    $scope.title = 'Classic';
+
+    $scope.playGame = function () {
+        $http({
+            method: "GET",
+            url: 'fizzBuzz/classicFast/' + $scope.teste,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(_success, _error);
+    };
+
+    function _success(response) {
+        $scope.result = response.data.desc;
+        $rootScope.addMessege("Choose others numbers and play again", "alert-success", "Congratulations! ");
+    }
+
+    function _error(response) {
+        $rootScope.addMessege(response.data.desc, "alert-danger", "Error: ");
+    }
+});
+
+app.controller('ClassicLNController', function ($scope, $rootScope, $http) {
+    $scope.classicSearch = {
+        numbers: ""
+    };
+
+    $scope.teste = '';
+    $scope.result = '';
+    $scope.title = 'Classic Large Numbers';
+
+    $scope.playGame = function () {
+        $http({
+            method: "GET",
+            url: 'fizzBuzz/classicBigNumber/' + $scope.teste,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(_success, _error);
+    };
+
+    function _success(response) {
+        $scope.result = response.data.desc;
+        $rootScope.addMessege("Choose others numbers and play again", "alert-success", "Congratulations! ");
+    }
+
+    function _error(response) {
+        $rootScope.addMessege(response.data.desc, "alert-danger", "Error: ");
+    }
+});
+
+app.controller('PlusController', function ($scope, $rootScope, $http) {
+    console.log('plus');
+
+    $scope.param = {
+        orderId: "",
+        typeId: "",
+        numbers: "",
+        rules: []
+    };
+
+    $scope.orders = [{
+        'id': 'U',
+        'desc': 'Unordered '
+    }, {
+        'id': 'A',
+        'desc': 'Ascending '
+    }, {
+        'id': 'D',
+        'desc': 'Descending '
+    }];
+    $scope.types = [{
+        'id': 'D',
+        'desc': 'Divisible '
+    }, {
+        'id': 'C',
+        'desc': 'Containing '
+    }, {
+        'id': 'B',
+        'desc': 'Both '
+    }];
+    $scope.rules = [{
+        'id': '3',
+        'desc': 'Fizz '
+    }, {
+        'id': '5',
+        'desc': 'Buzz '
+    }];
+
+    $scope.orderId = 'U';
+    $scope.typeId = 'D';
+    $scope.classicSearch = {
+        numbers: ""
+    };
+
+    $scope.teste = '';
+    $scope.result = '';
+    $scope.title = 'Custom';
+
+
+    $scope.newRule = function () {
+
+        var error = false;
+
+        if ($scope.ruleNumber == null || $scope.ruleNumber === '' || $scope.ruleNumber < 1) {
+            $rootScope.addMessege("To add a Rule, need to input a valid greater than zero number", "alert-danger", "Error: ");
+            error = true;
+        }
+        if ($scope.ruleDesc == null || $scope.ruleDesc === '') {
+            $rootScope.addMessege("To add a Rule, word is required!", "alert-danger", "Error: ");
+            error = true;
+        }
+
+        if (error) {
+            return;
+        }
+
+        $scope.rules.push({id: $scope.ruleNumber, desc: $scope.ruleDesc});
+
+        $scope.ruleNumber = '';
+        $scope.ruleDesc = '';
+
+    };
+
+
+    $scope.removeRule = function (item) {
+        var index = $scope.rules.indexOf(item);
+        $scope.rules.splice(index, 1);
+    };
+
+    $scope.playGame = function () {
+        $scope.param.numbers = $scope.teste;
+        $scope.param.orderId = $scope.orderId;
+        $scope.param.typeId = $scope.typeId;
+        $scope.param.rules = $scope.rules;
+        var param = angular.toJson($scope.param);
+        $http.post('custom', param, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(_success, _error);
+    };
+
+    function _success(response) {
+        $scope.result = response.data.desc;
+        $rootScope.addMessege("Choose others numbers and play again", "alert-success", "Congratulations! ");
+    }
+
+    function _error(response) {
+        $rootScope.addMessege(response.data.desc, "alert-danger", "Error: ");
+    }
+});

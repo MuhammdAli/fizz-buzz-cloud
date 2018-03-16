@@ -1,0 +1,33 @@
+</br>
+<div class="page-header">
+    <h2>{{title}}</h2>
+</div>
+<div ng-repeat="message in messeges">
+    <div role="alert" class="{{message.messageClass}} fadein fadeout"><strong>{{message.strong}} </strong>{{message.message}}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-9">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="test" class="col-sm-3 control-label">Game Test:</label>
+                <div class="col-sm-9">
+                    <input id="test" ng-model="teste" type="text" class="form-control"/>
+                    <input type="submit" value="Play" class="btn btn-primary" ng-click="playGame()"/>
+                    <md-tooltip md-delay="0">
+                        The game will considerate only numbers (1 2 3 4) and intervals (1-5) an other character will be
+                        disregarded.
+                        For instance: (1 omdkfvkd 2 sdfmfk3dmvks4 5-9 13-10) will be considerated (1 2 3 4 5 6 7 8 9)
+                        note that (13-10) are considerated a invalid interval
+                    </md-tooltip>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="result" class="col-sm-3 control-label">Result:</label>
+                <div id="result" class="col-sm-9">
+                    {{result}}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

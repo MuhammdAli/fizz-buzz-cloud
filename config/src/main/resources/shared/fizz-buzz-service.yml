@@ -1,0 +1,4 @@
+
+server:
+  context-path: /fizzBuzz
+  port: 7000
